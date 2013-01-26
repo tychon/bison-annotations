@@ -52,7 +52,7 @@ def grammar_parse(inputfile):
   implicit_types = []
   implicit_tokens = []
   ####### Read in beginnings of rules and the boundaries of their bodies:
-  rulegroupstart_regex = re.compile(r'^\s*(\w+)\s*\:\s*$', re.MULTILINE);
+  rulegroupstart_regex = re.compile(r'^\s*(\w+)\s*\:\s*$', re.MULTILINE)
   rules = [] # list of [{left:string_type, start: int_index, end: int_index}]
   for match in rulegroupstart_regex.finditer(mmappedfile):
     # add to implicit types, if not found in types:
@@ -152,7 +152,6 @@ def grammar_parse(inputfile):
   tokens.extend(implicit_tokens)
   result['tokens'] = tokens
   
-
   mmappedfile.close()
   inputf.close()
   
