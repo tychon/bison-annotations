@@ -3,6 +3,12 @@ bison-annotations
 
 Generate annotations about the usage of rules directly in the grammar file.
 
+Execute the main script with:
+
+```python main.py -i inputgrammar.y -o outputgrammar.y```
+
+The output file is a perfect copy of the input file except that old annotations are deleted and new ones are generated. I have not tested, what happens, if you give the same file as input and output. You should delete the input file and rename the output file if you want. Be careful: This script may fail on weird input and the output file may be empty in that case :-)
+
 The resulting annotations look like these:
 
 ```
