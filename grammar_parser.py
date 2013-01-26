@@ -112,7 +112,7 @@ def grammar_parse(inputfile):
           print "Info update from your regular expression logic: BOOOOOM!"
           raise SystemExit
     
-    # delete comments
+    # delete multiline comments
     comment_regex = re.compile(r'/\*|\*/')
     commentstart = -1
     while True:
@@ -125,6 +125,12 @@ def grammar_parse(inputfile):
         print "Remember: only comments over one group of rule are allowed!"
         raise SystemExit
       ruleright = ruleright[:commentstart] + ruleright[commentstart+2+mo.end():]
+    # delete one line comments
+    comment_regex = re.compile(r'(\/\/[^\n]*\n)');
+    while True:
+      mo = re.search(comment_regex, ruleright)
+      if not mo: break
+      ruleright = ruleright[:mo.start(1)] + ruleright[mo.end(1):]
     
     # split into single rules
     singlerules = [[]]

@@ -53,7 +53,6 @@ for t in grammar['types']:
           used = True
     if used: used_in.append(rule['left'])
   type_annos.append({'name': t, 'duplicates': duplicates, 'used_count': used_count, 'used_in': used_in})
-print type_annos
 
 print "Writing annotations to \""+outputfile+"\" ..."
 
