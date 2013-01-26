@@ -1,4 +1,9 @@
 
+# Copyright (C) 2013 Hannes Riechert <tychon4.2@gmail.com>
+# This work is free. You can redistribute it and/or modify it under the
+# terms of the Do What The Fuck You Want To Public License, Version 2,
+# as published by Sam Hocevar. See the LICENSE file for more details.
+
 import sys, os
 
 from grammar_parser import *
@@ -48,7 +53,6 @@ for t in grammar['types']:
           used = True
     if used: used_in.append(rule['left'])
   type_annos.append({'name': t, 'duplicates': duplicates, 'used_count': used_count, 'used_in': used_in})
-
 print type_annos
 
 print "Writing annotations to \""+outputfile+"\" ..."
@@ -66,8 +70,6 @@ for line in inf:
   if mo:
     # print annotation
     annos = [anno for anno in type_annos if anno['name'] == mo.group(1)]
-    if len(annos) != 1:
-      print "Found some rule, that I must have missed a moment ago: "+mo.group(1)
     anno = annos.pop(0)
     if anno['used_count'] is 0: outf.write("//"+comment_prefix+" This type is not used anywhere")
     elif anno['used_count'] is 1: outf.write("//"+comment_prefix+" This type is used only once in")
