@@ -158,3 +158,18 @@ def grammar_parse(inputfile):
   
   return result
 
+# This function should find productions for the same not terminal symbol and
+# put them all into one rule.
+def grammar_deduplicate(grammar):
+  index1 = 0
+  rules = grammar['rules']
+  while index1 < len(rules):
+    index2 = index1+1
+    while index2 < len(rules):
+      if rules[index2]['left'] == rules[index1]['left']:
+        # found duplicate rule
+        rules[index1]['right'].extend(rules[index2]['right'])
+        rules.pop(index2)
+      else: index2 += 1
+    index1 += 1
+

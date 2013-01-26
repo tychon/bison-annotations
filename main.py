@@ -14,5 +14,6 @@ while len(args) > 0:
 
 print "Parsing input file ..."
 grammar = grammar_parse(inputfile)
+grammar_deduplicate(grammar)
 print str(len(grammar['tokens']))+" tokens, "+str(len(grammar['types']))+" types."
 
