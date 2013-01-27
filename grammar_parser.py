@@ -16,6 +16,8 @@ import re, mmap
 # res['types'] = the union of declared_types and implicit_types
 # res['start_type'] = the start type declared in header (may be None, if it is not declared in bison declarations)
 # res['rules'] = {'left': string giving the type, 'right': [[list of tokens for every production]]}
+# 
+# This function may return None if there was a failure during parsing.
 def grammar_parse(inputfile):
   inputf = None
   mmappedfile = None
@@ -25,7 +27,7 @@ def grammar_parse(inputfile):
   except IOError, message: # Fehlerbehandlung
     print "Couldn't map input file into memory:"
     print message
-    raise IOError
+    return None
   
   result = {'inputfile': inputfile}
   
@@ -50,7 +52,7 @@ def grammar_parse(inputfile):
   for match in startsym_regex.finditer(mmappedfile):
     if startsymbol:
       print "Multiple definition of startsymbol with start!"
-      raise SystemExit
+      return None
     startsymbol = match.group(1)
   result['start_type'] = startsymbol
   
@@ -75,42 +77,9 @@ def grammar_parse(inputfile):
       mo = re.search('^%%$', mmappedfile[startindex:], re.MULTILINE);
       if not mo:
         print "No end of grammar definitions found!"
-        raise SystemExit
+        return None
       endindex = mo.start() + startindex
     ruleright = mmappedfile[startindex:endindex] # this is the body of the rule
-    
-    # delete code in curly braces
-    curlybrace_regex = re.compile(r"[^'](\{)[^']|[^'](\})[^']")
-    currentpos = 0
-    codestart = -1 # gives the position of the first brace
-    level = 0 # gives the level of nested braces
-    while True: # forever
-      mo = re.search(curlybrace_regex, ruleright[currentpos:])
-      if not mo:
-        if level > 0:
-          print "Missing curly brace in rules for '"+rule['left']+"'"
-          raise SystemExit
-        break
-      else:
-        if mo.group(1) == '{':
-          level += 1
-          if codestart < 0: codestart = currentpos + mo.start(1)
-          currentpos += mo.end(1)
-        elif mo.group(2) == '}':
-          if level is 0:
-            print "Too much closing curly braces in rules for '"+rule['left']+"'"
-            raise SystemExit
-          level -= 1
-          if level is 0:
-            # delete found codelet
-            ruleright = ruleright[:codestart] + ruleright[currentpos+mo.end(2):]
-            currentpos = codestart
-            codestart = -1
-          else:
-            currentpos += mo.end(2)
-        else:
-          print "Info update from your regular expression logic: BOOOOOM!"
-          raise SystemExit
     
     # delete multiline comments
     comment_regex = re.compile(r'/\*|\*/')
@@ -123,7 +92,7 @@ def grammar_parse(inputfile):
       if not mo:
         print "Missing closing comment symbol in rules for '"+rule['left']+"'"
         print "Remember: only comments over one group of rule are allowed!"
-        raise SystemExit
+        return None
       ruleright = ruleright[:commentstart] + ruleright[commentstart+2+mo.end():]
     # delete one line comments
     comment_regex = re.compile(r'(\/\/[^\n]*\n)');
@@ -131,6 +100,40 @@ def grammar_parse(inputfile):
       mo = re.search(comment_regex, ruleright)
       if not mo: break
       ruleright = ruleright[:mo.start(1)] + ruleright[mo.end(1):]
+    
+    # delete code in curly braces
+    curlybrace_regex = re.compile(r"[^'](\{)[^']|[^'](\})[^']")
+    currentpos = 0
+    codestart = -1 # gives the position of the first brace
+    level = 0 # gives the level of nested braces
+    while True: # forever
+      mo = re.search(curlybrace_regex, ruleright[currentpos:])
+      if not mo:
+        if level > 0:
+          print "Missing curly brace in rules for '"+rule['left']+"', nesting level: "+str(level)+" Code:"
+          print ruleright
+          return None
+        break
+      else:
+        if mo.group(1) == '{':
+          level += 1
+          if codestart < 0: codestart = currentpos + mo.start(1)
+          currentpos += mo.end(1)
+        elif mo.group(2) == '}':
+          if level is 0:
+            print "Too much closing curly braces in rules for '"+rule['left']+"'"
+            return None
+          level -= 1
+          if level is 0:
+            # delete found codelet
+            ruleright = ruleright[:codestart] + ruleright[currentpos+mo.end(2):]
+            currentpos = codestart
+            codestart = -1
+          else:
+            currentpos += mo.end(2)
+        else:
+          print "Info update from your regular expression logic: BOOOOOM!"
+          return None
     
     # split into single rules
     singlerules = [[]]

@@ -21,7 +21,7 @@ while len(args) > 0:
   elif arg == '-o': outputfile = os.path.abspath(args.pop(0))
   else:
     print "Unknown argument."
-    raise SystemExit
+    sys.exit(1)
 
 if not inputfile or not outputfile:
   print "Give inputfile with -i PATH and outpufile with -o PATH."
@@ -29,6 +29,9 @@ if not inputfile or not outputfile:
 
 print "Parsing input file \""+inputfile+"\" ..."
 grammar = grammar_parse(inputfile)
+if not grammar:
+  print "Parsing of grammar failed."
+  sys.exit(1)
 print str(len(grammar['tokens']))+" tokens, "+str(len(grammar['types']))+" types."
 
 print "Generating annotations ..."
