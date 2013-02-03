@@ -24,19 +24,17 @@ First it says how often it is used, then where. Because one symbol may have more
 
 ## Formatting of grammar file
 
-The token and type declarations in the grammar hav to look like these:
+The token and type declarations in the grammar have to look like these:
 
 ```
 %token TYPE1 TYPE2 TYPE3
 /* or */
 %token <...> TYPE1 TYPE2 TYPE3
 
-%type TYPE1 TYPE2 TYPE3
-/* or */
 %type <...> TYPE1 TYPE2 TYPE3
 ```
 
-Rules in the grammar have to look like this:
+Rules in the grammar have to look similar to this one:
 
 ```
 primary_expression:
@@ -52,5 +50,5 @@ primary_expression:
 ```
 
 * The left side of the productions `primary_expression:` must go into one single line with no other characters except whitespaces.
-* You may use make comments with `/* ... */`
-* Lines beginning with `//annotations:` or `//` are ignored when rewriting the file thus old annotations vanish.
+* You may make comments with `/* ... */` or `//`
+* Lines beginning with `//annotations:` are ignored when rewriting the file thus old annotations vanish.
